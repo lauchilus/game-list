@@ -1,0 +1,1 @@
+ALTER TABLE playing ADD COLUMN game_id INT NOT NULL;
