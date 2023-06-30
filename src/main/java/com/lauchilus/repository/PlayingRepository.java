@@ -13,5 +13,7 @@ public interface PlayingRepository extends JpaRepository<Playing, Integer> {
 	@Query("SELECT p FROM Playing p JOIN p.user u WHERE u.username = :username")
     Page<Playing> findByUsername(@Param("username") String username, Pageable pageable);
 
+	boolean existsByUser_idAndId(Integer id, Integer playingId);
+
 
 }

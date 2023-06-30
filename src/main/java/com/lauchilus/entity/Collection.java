@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.lauchilus.DTO.CreateCollectionDTO;
+import com.lauchilus.DTO.UpdateCollectionDto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -62,4 +63,13 @@ public class Collection {
     public void addGame(Game game) {
     	this.games.add(game);
     }
+
+	public void update(@Valid UpdateCollectionDto updateCollection) {
+		if(updateCollection.name()!=null) this.name=updateCollection.name();
+		if(updateCollection.image()!=null) this.image=updateCollection.image();
+		if(updateCollection.description()!=null) this.description=updateCollection.description();
+		
+	}
+
+	
 }

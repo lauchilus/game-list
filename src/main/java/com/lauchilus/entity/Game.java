@@ -1,5 +1,7 @@
 package com.lauchilus.entity;
 
+import java.time.LocalDateTime;
+
 import com.lauchilus.DTO.AddGameDto;
 
 import jakarta.persistence.Entity;
@@ -36,6 +38,8 @@ public class Game {
     @ManyToOne
     @JoinColumn(name = "collection_id")
     private Collection collection;
+    
+    private LocalDateTime addedDate = LocalDateTime.now();
     
     public Game(@Valid AddGameDto addGamedto, Collection collection) {
 		this.game_Id = addGamedto.game_Id();

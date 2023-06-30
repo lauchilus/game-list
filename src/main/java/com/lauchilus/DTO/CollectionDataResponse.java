@@ -1,5 +1,15 @@
 package com.lauchilus.DTO;
 
-public record CollectionDataResponse() {
+import com.lauchilus.entity.Collection;
+
+public record CollectionDataResponse(
+		String name,
+		String description,
+		Byte[] image
+		) {
+
+	public CollectionDataResponse(Collection collection) {
+		this(collection.getName(),collection.getDescription(),collection.getImage());
+	}
 
 }

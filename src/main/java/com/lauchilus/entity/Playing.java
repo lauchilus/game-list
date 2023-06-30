@@ -1,5 +1,7 @@
 package com.lauchilus.entity;
 
+import java.time.LocalDateTime;
+
 import com.lauchilus.DTO.AddPlayingDto;
 
 import jakarta.persistence.CascadeType;
@@ -40,7 +42,9 @@ public class Playing {
     private String description;
     @Lob
     private Byte[] image;
-    
+
+    private LocalDateTime startDate = LocalDateTime.now();
+    private LocalDateTime finishDate = null;
     private Integer game_id;
     
     public Playing(@Valid AddPlayingDto playingDto, User user) {
@@ -49,6 +53,10 @@ public class Playing {
 		this.description = playingDto.description();
 		this.image = playingDto.image();
 		this.game_id = playingDto.game_id();
+	}
+
+	public void updateFinishDate() {
+		this.finishDate = LocalDateTime.now();		
 	}
 
     
