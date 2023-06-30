@@ -1,0 +1,2 @@
+ALTER TABLE collections MODIFY COLUMN image BLOB;
+ALTER TABLE playing MODIFY COLUMN image BLOB;

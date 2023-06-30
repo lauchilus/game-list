@@ -85,8 +85,19 @@ public class IgdbService {
 		    JsonNode jsonNode = objectMapper.readTree(responseBody);
 
 		    int id = jsonNode.get(0).get("id").asInt();
-		    return id;
+		    return id;		
+	}
+	
+	public String searchGameById(Integer id) throws IOException{
+		APICalypse apiCalypse = new APICalypse()
+				.fields("*")
+				.where("id = " + id);
+		String requestBody = apiCalypse.buildQuery();		
+		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
+		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/games/", HttpMethod.POST, httpEntity,
+				String.class);		
 		
+		return response.getBody().toString();		
 	}
 	
 	public Object searchCharacter(String name) {

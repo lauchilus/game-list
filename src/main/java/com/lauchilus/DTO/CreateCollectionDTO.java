@@ -12,7 +12,7 @@ public record CreateCollectionDTO(
 		String name,
 		@NotBlank
 		String description,
-		String image
+		Byte[] image
 		) {
 
 }

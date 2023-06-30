@@ -2,6 +2,7 @@ package com.lauchilus.entity;
 
 import com.lauchilus.DTO.AddPlayedDto;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,16 +27,13 @@ import lombok.Setter;
 @EqualsAndHashCode(of="id")
 public class Played {
 
-	
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private User user;
-
     private Integer game_id;
     
     public Played(User user, @Valid AddPlayedDto playedDto) {

@@ -1,5 +1,6 @@
 package com.lauchilus.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -32,16 +34,30 @@ public class User implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Integer id;
 	
 	private String username;
 	private String password;
+	
+//	@OneToMany(mappedBy = "user")
+//	private List<Played> played = new ArrayList<>();
+	@OneToMany(mappedBy = "user")
+	private List<Playing> playing = new ArrayList<>();
 	
 	
 	public User(@Valid UserRegisterDTO userRegisterDTO) {
 		this.username = userRegisterDTO.username();
 		this.password = userRegisterDTO.password();
 	}
+	
+//	public void addPlayed(Played played) {
+//		this.played.add(played);
+//	}
+	
+	public void addPlaying(Playing playing) {
+		this.playing.add(playing);
+	}
+	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
@@ -77,5 +93,6 @@ public class User implements UserDetails {
 		// TODO Auto-generated method stub
 		return true;
 	}
+	
 	
 }

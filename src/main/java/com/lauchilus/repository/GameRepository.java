@@ -6,11 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.lauchilus.entity.Collection;
-import com.lauchilus.entity.Played;
+import com.lauchilus.entity.Game;
 
-public interface CollectionRepository extends JpaRepository<Collection, Integer> {
+public interface GameRepository extends JpaRepository<Game, Integer> {
 
-	@Query("SELECT p FROM Collection p JOIN p.user u WHERE u.username = :username")
-	Page<Collection> findByUsername(String username, Pageable paginacion);
-
+	@Query("SELECT p FROM Game p JOIN p.collection u WHERE u.name = :collection")
+	Page<Game> findByCollection(String collection, Pageable paginacion);
 }

@@ -18,27 +18,23 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
-@EnableWebSecurity(debug =true)
+@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
 	@Autowired
 	private SecurityFilter securityFilter;
 
-	
 	@SuppressWarnings("deprecation")
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
 		System.out.println("LA POUTA QUE TE PARIO");
-		
-		return httpSecurity.csrf(csrf -> csrf.disable())				
+
+		return httpSecurity.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(
-						authz -> authz.requestMatchers("/login").permitAll().anyRequest().authenticated() )
+						authz -> authz.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
-		
-
-
 	}
 
 	@Bean

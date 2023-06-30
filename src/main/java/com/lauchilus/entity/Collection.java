@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -43,7 +44,8 @@ public class Collection {
 
     private String name;
     private String description;
-    private String image;
+    @Lob
+    private Byte[] image;
     
     @OneToMany(mappedBy = "collection")
     private List<Game> games = new ArrayList<>();
@@ -52,8 +54,12 @@ public class Collection {
 		this.user = user;
 		this.name = createCollectionDTO.name();
 		this.description = createCollectionDTO.description();
-		if(!createCollectionDTO.image().isBlank()) {
+		if(!createCollectionDTO.image().equals(null)) {
 		this.image = createCollectionDTO.image();
 		}
 	}
+    
+    public void addGame(Game game) {
+    	this.games.add(game);
+    }
 }

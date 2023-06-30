@@ -2,11 +2,13 @@ package com.lauchilus.entity;
 
 import com.lauchilus.DTO.AddPlayingDto;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
@@ -30,13 +32,14 @@ public class Playing {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 	
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private User user;
 
     private String name;
     private String description;
-    private String image;
+    @Lob
+    private Byte[] image;
     
     private Integer game_id;
     
