@@ -7,10 +7,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.lauchilus.DTO.RegisterDto;
 import com.lauchilus.DTO.UserRegisterDTO;
@@ -22,7 +23,7 @@ import com.lauchilus.security.TokenService;
 import jakarta.validation.Valid;
 
 
-@RestController
+@Controller
 @RequestMapping("/auth")
 public class AuthController {
 	
@@ -38,6 +39,16 @@ public class AuthController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	
+//	@GetMapping("/login")
+//    public String showLoginPage() {
+//        return "login"; // Nombre de la plantilla de login
+//    }
+//
+//    @GetMapping("/register")
+//    public String showRegistrationPage() {
+//        return "register"; // Nombre de la plantilla de registro
+//    }
 	
 	@PostMapping("/login")
 	public ResponseEntity autenticarUsuario(@RequestBody @Valid UserRegisterDTO user) {

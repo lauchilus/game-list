@@ -2,14 +2,12 @@ package com.lauchilus;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.client.RestTemplate;
 
-import com.api.igdb.request.IGDBWrapper;
-import com.api.igdb.request.TwitchAuthenticator;
-import com.api.igdb.utils.TwitchToken;
+import jakarta.servlet.MultipartConfigElement;
 
 @SpringBootApplication
 public class CrudPhotoIdgbApplication {
@@ -17,6 +15,15 @@ public class CrudPhotoIdgbApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CrudPhotoIdgbApplication.class, args);
 	}
+	
+	 @Bean
+	    public MultipartConfigElement multipartConfigElement() {
+		 MultipartConfigFactory factory = new MultipartConfigFactory();
+	        factory.setFileSizeThreshold(DataSize.ofBytes(2 * 1024 * 1024)); // Tamaño máximo del archivo
+	        factory.setMaxFileSize(DataSize.ofMegabytes(10)); // Tamaño máximo del archivo
+	        factory.setMaxRequestSize(DataSize.ofMegabytes(50)); // Tamaño máximo de la solicitud
+	        return factory.createMultipartConfig();
+	    }
 	
 	@Bean
 	RestTemplate restTemplate() {

@@ -7,7 +7,7 @@ public record PlayingDataCollection(
 		Integer id,
 		Integer user,
 		String name,
-		String Description,
+		String cover,
 		Byte[] image,
 		Integer game_id
 		) {
