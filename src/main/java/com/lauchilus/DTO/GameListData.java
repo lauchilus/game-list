@@ -8,6 +8,6 @@ public class GameListData {
 	private Integer id;
 	private String name;
 	private String storyline;
-	private ScreenshotsDataGame[] screenshots;
+	private CoverGame cover;
 	private Integer follows;
 }

@@ -38,18 +38,20 @@ public class Played {
 	private User user;
 	private Integer game_id;
 
-	// TODO create variables for image and date started and finish update table in
-	// database
+	@Lob
+    private byte[] image;
+
+    private LocalDateTime startDate = LocalDateTime.now();
 
 	public Played(User user, @Valid AddPlayedDto playedDto) {
 		this.user = user;
-		this.game_id = playedDto.game();
+		this.game_id = playedDto.game_Id();
 	}
 
 	public Played(User user, Integer game_id) {
 		this.user = user;
 		this.game_id = game_id;
 	}
-	
-	
+
+
 }

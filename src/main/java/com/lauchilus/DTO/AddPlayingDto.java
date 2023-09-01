@@ -8,7 +8,6 @@ public record AddPlayingDto(
 		String name,
 		@NotBlank
 		String description,
-		Byte[] image,
 		@NotNull
 		Integer game_id
 		) {

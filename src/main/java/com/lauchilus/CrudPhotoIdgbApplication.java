@@ -15,7 +15,7 @@ public class CrudPhotoIdgbApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CrudPhotoIdgbApplication.class, args);
 	}
-	
+
 	 @Bean
 	    public MultipartConfigElement multipartConfigElement() {
 		 MultipartConfigFactory factory = new MultipartConfigFactory();
@@ -24,13 +24,13 @@ public class CrudPhotoIdgbApplication {
 	        factory.setMaxRequestSize(DataSize.ofMegabytes(50)); // Tamaño máximo de la solicitud
 	        return factory.createMultipartConfig();
 	    }
-	
+
 	@Bean
 	RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
 
-	
+
 //	@Bean
 //	HttpHeaders apiHeaders() {
 //		String apiClientId = "mk5fdnm6nd2vzxr4uxv2aoblpxjlof";

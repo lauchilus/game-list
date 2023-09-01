@@ -12,5 +12,5 @@ public record PlayedDataCollection(
 	public PlayedDataCollection(Played played) {
 		this(played.getId(),played.getUser(),played.getGame_id());
 	}
-	
+
 }

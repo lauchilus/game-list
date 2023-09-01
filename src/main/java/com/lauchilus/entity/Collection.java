@@ -3,8 +3,6 @@ package com.lauchilus.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.lauchilus.DTO.CreateCollectionDTO;
 import com.lauchilus.DTO.UpdateCollectionDto;
 
@@ -33,12 +31,12 @@ import lombok.Setter;
 @EqualsAndHashCode(of="id")
 public class Collection {
 
-	
+
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -47,10 +45,10 @@ public class Collection {
     private String description;
     @Lob
     private Byte[] image;
-    
+
     @OneToMany(mappedBy = "collection")
     private List<Game> games = new ArrayList<>();
-    
+
     public Collection(@Valid CreateCollectionDTO createCollectionDTO, User user) {
 		this.user = user;
 		this.name = createCollectionDTO.name();
@@ -59,7 +57,7 @@ public class Collection {
 		this.image = createCollectionDTO.image();
 		}
 	}
-    
+
     public void addGame(Game game) {
     	this.games.add(game);
     }
@@ -68,8 +66,8 @@ public class Collection {
 		if(updateCollection.name()!=null) this.name=updateCollection.name();
 		if(updateCollection.image()!=null) this.image=updateCollection.image();
 		if(updateCollection.description()!=null) this.description=updateCollection.description();
-		
+
 	}
 
-	
+
 }

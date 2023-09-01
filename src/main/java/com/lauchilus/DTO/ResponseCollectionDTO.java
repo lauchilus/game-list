@@ -7,7 +7,7 @@ public record ResponseCollectionDTO(
 		String name,
 		String description,
 		Byte[] image
-		
+
 		) {
 
 	public ResponseCollectionDTO(Collection collection) {

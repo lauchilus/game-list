@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
 
 import com.api.igdb.request.IGDBWrapper;
 import com.api.igdb.request.TwitchAuthenticator;
@@ -32,9 +31,9 @@ public class IgdbConfiguration {
 
 		return headers;
 	}
-	
-	
-	
+
+
+
 //	@Bean
 //	HttpHeaders apiHeaders() {
 //		String apiClientId = "mk5fdnm6nd2vzxr4uxv2aoblpxjlof";

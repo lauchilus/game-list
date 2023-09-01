@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/profile/${id}")
 public class ProfileController {
 
-	
-	
+
+
 }

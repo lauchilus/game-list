@@ -1,7 +1,7 @@
 package com.lauchilus.igdb;
 
 import com.lauchilus.DTO.CategoryEnum;
-import com.lauchilus.DTO.ScreenshotsDataGame;
+import com.lauchilus.DTO.CoverGame;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ public class GameData {
 	private Double aggregated_rating;
 	private CategoryEnum category;
 	private String collection;
-	private ScreenshotsDataGame[] screenshots;
+	private CoverGame cover;
 	private String name;
 	private String summary;
 

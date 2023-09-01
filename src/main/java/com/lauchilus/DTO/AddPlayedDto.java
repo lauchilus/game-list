@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotNull;
 
 public record AddPlayedDto(
 		@NotNull
-		Integer game
+		Integer game_Id,
+		@NotNull
+		byte[] image
+		
 		) {
 
 }

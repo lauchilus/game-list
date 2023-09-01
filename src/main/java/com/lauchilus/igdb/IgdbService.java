@@ -1,10 +1,6 @@
 package com.lauchilus.igdb;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -18,6 +14,7 @@ import com.api.igdb.apicalypse.APICalypse;
 import com.api.igdb.apicalypse.Sort;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lauchilus.DTO.CoverGame;
 
 @Service
 public class IgdbService {
@@ -25,69 +22,35 @@ public class IgdbService {
 	private RestTemplate restTemplate;
 
 	@Autowired
-	private HttpHeaders headers = new HttpHeaders();;
-
-//	private final IGDBWrapper wrapper;
-//	 public IgdbService(IGDBWrapper wrapper) {
-//	        this.wrapper = wrapper;
-//	    }
-
-//	public String hacerSolicitud() throws RequestException {
-//		String json = wrapper.apiJsonRequest(Endpoints.GAMES, "fields name; limit 10");
-//		return json;
-//	}
+	private HttpHeaders headers = new HttpHeaders();
 
 	public String listar() {
-		// Crea el cuerpo de la solicitud
 		String requestBody = "fields name; limit 10;";
-
 		// Crea una HttpEntity con los encabezados y el cuerpo
-		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/games/", HttpMethod.POST, httpEntity,
-				String.class);
-
+		ResponseEntity<String> response = callEndpointGames(requestBody);
 		return response.getBody().toString();
 	}
 
-//	public String searchGame(SearchRequestDTO search) {
-//
-//		APICalypse apiCalypse = new APICalypse()
-//				.fields("name, game,published_at")
-//				.limit(15).search(search.name());
-//		String requestBody = apiCalypse.buildQuery();
-//		
-//		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-//		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/search", HttpMethod.POST, httpEntity,
-//				String.class);
-//		return response.toString();
-//	}
-
 	public String searchGame(String game) {
-		APICalypse apiCalypse = new APICalypse().fields("summary,name,aggregated_rating,category, screenshots.image_id,collection")
-				.search(game).limit(1).where("category=0");
+		APICalypse apiCalypse = new APICalypse()
+				.fields("summary,name,aggregated_rating,category, cover.image_id,collection").search(game).limit(1)
+				.where("category=0");
 		String requestBody = apiCalypse.buildQuery();
-
-		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/games/", HttpMethod.POST, httpEntity,
-				String.class);
+		ResponseEntity<String> response = callEndpointGames(requestBody);
 		return response.getBody().toString();
 	}
 
 	public byte[] processImage(String url) throws IOException {
-		
 		HttpEntity<String> httpEntity = new HttpEntity<>(headers);
-		ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity,
-				byte[].class);
-		System.out.println(response);
+		ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, byte[].class);
 		return response.getBody();
 	}
 
 	public String getCollection(String string) {
 		APICalypse apiCalypse = new APICalypse().fields("name").where("id=" + string);
 		String requestBody = apiCalypse.buildQuery();
-		System.out.println(requestBody);
 		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/collections", HttpMethod.POST,
+		ResponseEntity<String> response = restTemplate.exchange("https://api.igdb.com/v4/collections", HttpMethod.POST,
 				httpEntity, String.class);
 		System.out.println(response.getBody().toString());
 		return response.getBody().toString();
@@ -98,8 +61,8 @@ public class IgdbService {
 		String requestBody = apiCalypse.buildQuery();
 
 		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/search", HttpMethod.POST, httpEntity,
-				String.class);
+		ResponseEntity<String> response = restTemplate.exchange("https://api.igdb.com/v4/search", HttpMethod.POST,
+				httpEntity, String.class);
 		String responseBody = response.getBody().toString();
 
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -110,12 +73,11 @@ public class IgdbService {
 	}
 
 	public String searchGameById(Integer id) throws IOException {
-		APICalypse apiCalypse = new APICalypse().fields("*").where("id = " + id);
+		APICalypse apiCalypse = new APICalypse()
+				.fields("summary,name,aggregated_rating,category, cover.image_id,collection").limit(1)
+				.where("id=" + id);
 		String requestBody = apiCalypse.buildQuery();
-		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/games/", HttpMethod.POST, httpEntity,
-				String.class);
-
+		ResponseEntity<String> response = callEndpointGames(requestBody);
 		return response.getBody().toString();
 	}
 
@@ -124,25 +86,31 @@ public class IgdbService {
 		String requestBody = apiCalypse.buildQuery();
 
 		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/search", HttpMethod.POST, httpEntity,
-				String.class);
+		ResponseEntity<String> response = restTemplate.exchange("https://api.igdb.com/v4/search", HttpMethod.POST,
+				httpEntity, String.class);
 		return response.toString();
 	}
-	
+
 	public String listGames() {
-		APICalypse apiCalypse = new APICalypse().fields("name,storyline,follows,screenshots.image_id").limit(10);
+		APICalypse apiCalypse = new APICalypse().fields("name,storyline,follows,cover.image_id").limit(10)
+				.sort("follows", Sort.DESCENDING).where("follows!=null");
 		String requestBody = apiCalypse.buildQuery();
-		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/games/", HttpMethod.POST, httpEntity,
-				String.class);
+		ResponseEntity<String> response = callEndpointGames(requestBody);
 		return response.getBody().toString();
-		
+
 	}
 
+	public String getImagesIds(Integer game) {
+		APICalypse apiCalypse = new APICalypse().fields("cover.image_id").where("id=" + game);
+		String requestBody = apiCalypse.buildQuery();
+		ResponseEntity<String> response = callEndpointGames(requestBody);
+		return response.toString();
+	}
+
+	private ResponseEntity<String> callEndpointGames(String requestBody) {
+		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
+		ResponseEntity<String> response = restTemplate.exchange("https://api.igdb.com/v4/games/", HttpMethod.POST,
+				httpEntity, String.class);
+		return response;
+	}
 }
-//		String requestBody = "fields *; search \"" + name + "\"; limit 50;";
-//		HttpEntity<String> httpEntity = new HttpEntity<>(requestBody, headers);
-//		ResponseEntity response = restTemplate.exchange("https://api.igdb.com/v4/search", HttpMethod.POST, httpEntity,
-//				String.class);
-//		
-//		return response.getBody().toString();

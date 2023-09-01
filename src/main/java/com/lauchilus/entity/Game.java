@@ -27,23 +27,23 @@ import lombok.Setter;
 @EqualsAndHashCode(of="id")
 public class Game {
 
-	
+
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	private Integer game_Id;
 
     @ManyToOne
     @JoinColumn(name = "collection_id")
     private Collection collection;
-    
+
     private LocalDateTime addedDate = LocalDateTime.now();
-    
+
     public Game(@Valid AddGameDto addGamedto, Collection collection) {
 		this.game_Id = addGamedto.game_Id();
 		this.collection = collection;
 	}
-    
+
 }
