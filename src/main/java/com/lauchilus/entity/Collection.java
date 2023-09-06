@@ -44,7 +44,7 @@ public class Collection {
     private String name;
     private String description;
     @Lob
-    private Byte[] image;
+    private byte[] image;
 
     @OneToMany(mappedBy = "collection")
     private List<Game> games = new ArrayList<>();

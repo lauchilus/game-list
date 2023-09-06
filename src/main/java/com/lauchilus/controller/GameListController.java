@@ -37,7 +37,7 @@ import com.lauchilus.DTO.GameDTO;
 import com.lauchilus.DTO.GameListData;
 import com.lauchilus.DTO.GameMapper;
 import com.lauchilus.DTO.ListResponseDto;
-import com.lauchilus.DTO.PlayedDataCollection;
+import com.lauchilus.DTO.PlayedResponseDto;
 import com.lauchilus.DTO.PlayingResponseDto;
 import com.lauchilus.DTO.ResponseCollectionDTO;
 import com.lauchilus.DTO.SearchResponseDto;
@@ -96,7 +96,7 @@ public class GameListController {
 		Collection collection = collectionRepository
 				.save(new Collection(createCollectionDTO, userRepository.findByUsername(createCollectionDTO.user())));
 		ResponseCollectionDTO response = new ResponseCollectionDTO(collection.getId(), collection.getName(),
-				collection.getDescription(), collection.getImage());
+				collection.getDescription(), convertByteArrayToString(collection.getImage()));
 		URI url = uriComponentsBuilder.path("/${id}").buildAndExpand(collection.getId()).toUri();
 		return ResponseEntity.created(url).body(response);
 	}
@@ -146,10 +146,20 @@ public class GameListController {
 	// This endpoint retrieves all the played games for a given username provided as
 	// a @PathVariable in the URL.
 	@GetMapping("/{username}/played")
-	public ResponseEntity getPlayedList(@PageableDefault(size = 10) Pageable paginacion,
-			@PathVariable String username) {
-		return ResponseEntity
-				.ok((playedRepository.findByUsername(username, paginacion).map(PlayedDataCollection::new)));
+	public ResponseEntity getPlayedList(@PathVariable String username) throws IOException {
+		List<Played> playedList = playedRepository.findByUsername(username);
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<PlayedResponseDto> responseList = new ArrayList<>();
+
+		for (Played data : playedList) {
+			String game = service.searchGameById(data.getGame_id()).toString();
+			GameMapper[] dataCover = objectMapper.readValue(game, GameMapper[].class);
+			String base64Image = getImageResponse(dataCover[0].getCover());
+			PlayedResponseDto response = new PlayedResponseDto(data, dataCover[0].getName(), base64Image);
+			responseList.add(response);
+		}
+		System.out.println(responseList.toString());
+		return ResponseEntity.ok(responseList);
 
 	}
 
@@ -165,11 +175,7 @@ public class GameListController {
 		for (Playing data : playingList) {
 			String game = service.searchGameById(data.getGame_id()).toString();
 			GameMapper[] dataCover = objectMapper.readValue(game, GameMapper[].class);
-			String ss = dataCover[0].getCover().getImage_id();
-			String imageUrl = ImageBuilderKt.imageBuilder(ss, ImageSize.SCREENSHOT_MEDIUM, ImageType.PNG);
-			byte[] cover = service.processImage(imageUrl);
-			byte[] coverByte = cover;
-			String base64Image = Base64.getEncoder().encodeToString(coverByte);
+			String base64Image = getImageResponse(dataCover[0].getCover());
 			PlayingResponseDto response = new PlayingResponseDto(data, base64Image);
 			responseList.add(response);
 		}
@@ -181,14 +187,23 @@ public class GameListController {
 	@GetMapping("/{username}/collections")
 	public ResponseEntity getCollections(@PageableDefault(size = 10) Pageable paginacion,
 			@PathVariable String username) {
-		return ResponseEntity
-				.ok((collectionRepository.findByUsername(username, paginacion).map(ResponseCollectionDTO::new)));
+		List<Collection> playingList = collectionRepository.findByUsername(username, paginacion);
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<ResponseCollectionDTO> responseList = new ArrayList<>();
+
+		for (Collection data : playingList) {
+			String base64Image = convertByteArrayToString(data.getImage());
+			ResponseCollectionDTO response = new ResponseCollectionDTO(data, base64Image);
+			responseList.add(response);
+		}
+		return ResponseEntity.ok(responseList);
 	}
 
 	// This endpoint retrieves all the data of the collection for a given username
 	// and collection ID provided as @PathVariable in the URL.
 	@GetMapping("/{username}/{collectionid}")
-	public ResponseEntity<CollectionDataResponse> getCollection(@PathVariable String username, @PathVariable Integer collectionid) {
+	public ResponseEntity<CollectionDataResponse> getCollection(@PathVariable String username,
+			@PathVariable Integer collectionid) {
 		if (!collectionRepository.existsByUser_idAndId(userRepository.getReferenceByUsername(username).getId(),
 				collectionid)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -200,9 +215,20 @@ public class GameListController {
 	// This endpoint retrieves a list of all the games in a collection specified as
 	// a @PathVariable in the URL.
 	@GetMapping("/{collection}/games")
-	public ResponseEntity getGamesCollection(@PageableDefault(size = 10) Pageable paginacion,
-			@PathVariable Integer collection) {
-		return ResponseEntity.ok((gameRepository.findByCollection_id(collection, paginacion).map(GameDTO::new)));
+	public ResponseEntity<List<ListResponseDto>> getGamesCollection(@PageableDefault(size = 10) Pageable paginacion,
+			@PathVariable Integer collection) throws IOException {
+		List<Game> response = gameRepository.findByCollection_id(collection);
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<ListResponseDto> responseList = new ArrayList<>();
+		for(Game game: response) {
+			String res = service.searchGameById2(game.getGame_Id());
+			GameListData[] data = objectMapper.readValue(res, GameListData[].class);
+			GameListData dat = data[0];
+			String image = getImageResponse(dat.getCover());
+			ListResponseDto resp = new ListResponseDto(dat, image);
+			responseList.add(resp);
+		}
+		return ResponseEntity.ok(responseList);
 	}
 
 	// This endpoint searches for a game in the IGDB API based on a name provided as
@@ -213,13 +239,11 @@ public class GameListController {
 		String response = service.searchGame(name);
 		ObjectMapper objectMapper = new ObjectMapper();
 		GameData[] dataArray = objectMapper.readValue(response, GameData[].class);
-		GameData data = dataArray[0];		
+		GameData data = dataArray[0];
 		String image = getImageResponse(data.getCover());
 		SearchResponseDto resp = new SearchResponseDto(data, image, data.getCollection());
 		return ResponseEntity.ok(resp);
 	}
-	
-	
 
 	@GetMapping("/listGames")
 	public ResponseEntity<List<ListResponseDto>> listOfGames() throws IOException {
@@ -232,8 +256,8 @@ public class GameListController {
 		for (GameListData data : dataArray) {
 			String image = getImageResponse(data.getCover());
 			ListResponseDto resp = new ListResponseDto(data, image);
-				responseList.add(resp);
-			
+			responseList.add(resp);
+
 		}
 		return ResponseEntity.ok(responseList);
 	}
@@ -260,8 +284,8 @@ public class GameListController {
 	// an image in byte[] format.
 	@PutMapping("/{username}/{collectionid}")
 	@Transactional
-	public ResponseEntity<CollectionDataResponse> updateCollection(@PathVariable String username, @PathVariable Integer collectionid,
-			@RequestBody @Valid UpdateCollectionDto updateCollection) {
+	public ResponseEntity<CollectionDataResponse> updateCollection(@PathVariable String username,
+			@PathVariable Integer collectionid, @RequestBody @Valid UpdateCollectionDto updateCollection) {
 		if (!collectionRepository.existsByUser_idAndId(userRepository.getReferenceByUsername(username).getId(),
 				collectionid)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -313,13 +337,17 @@ public class GameListController {
 		collectionRepository.delete(collection);
 		return ResponseEntity.ok("Collection deleted");
 	}
-	
-	//helpers
+
+	// helpers
 	private String getImageResponse(CoverGame data) throws IOException {
 		String ss = data.getImage_id();
-		String imageUrl = ImageBuilderKt.imageBuilder(ss, ImageSize.SCREENSHOT_BIG,
-				ImageType.PNG);
+		String imageUrl = ImageBuilderKt.imageBuilder(ss, ImageSize.SCREENSHOT_BIG, ImageType.PNG);
 		byte[] image = service.processImage(imageUrl);
+		String base64Image = Base64.getEncoder().encodeToString(image);
+		return base64Image;
+	}
+
+	private String convertByteArrayToString(byte[] image) {
 		String base64Image = Base64.getEncoder().encodeToString(image);
 		return base64Image;
 	}

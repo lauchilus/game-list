@@ -81,6 +81,14 @@ public class IgdbService {
 		return response.getBody().toString();
 	}
 
+	public String searchGameById2(Integer id) throws IOException {
+		APICalypse apiCalypse = new APICalypse()
+				.fields("name,storyline,follows,cover.image_id").where("id="+id);
+		String requestBody = apiCalypse.buildQuery();
+		ResponseEntity<String> response = callEndpointGames(requestBody);
+		return response.getBody().toString();
+	}
+	
 	public Object searchCharacter(String name) {
 		APICalypse apiCalypse = new APICalypse().fields("character").search(name);
 		String requestBody = apiCalypse.buildQuery();

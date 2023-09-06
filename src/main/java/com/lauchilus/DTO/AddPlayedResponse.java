@@ -12,7 +12,7 @@ public record AddPlayedResponse(
 		) {
 
 	public AddPlayedResponse(Played played,String image) {
-		this(played.getId(),played.getGame_id(),image,played.getStartDate());
+		this(played.getId(),played.getGame_id(),image,LocalDateTime.now());
 	}
 
 }

@@ -5,7 +5,7 @@ import com.lauchilus.entity.Collection;
 public record CollectionDataResponse(
 		String name,
 		String description,
-		Byte[] image
+		byte[] image
 		) {
 
 	public CollectionDataResponse(Collection collection) {

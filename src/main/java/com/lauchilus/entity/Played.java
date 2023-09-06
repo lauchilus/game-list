@@ -38,11 +38,6 @@ public class Played {
 	private User user;
 	private Integer game_id;
 
-	@Lob
-    private byte[] image;
-
-    private LocalDateTime startDate = LocalDateTime.now();
-
 	public Played(User user, @Valid AddPlayedDto playedDto) {
 		this.user = user;
 		this.game_id = playedDto.game_Id();

@@ -6,11 +6,11 @@ public record ResponseCollectionDTO(
 		Integer id,
 		String name,
 		String description,
-		Byte[] image
+		String image
 
 		) {
 
-	public ResponseCollectionDTO(Collection collection) {
-		this(collection.getId(),collection.getName(),collection.getDescription(),collection.getImage());
+	public ResponseCollectionDTO(Collection collection,String image) {
+		this(collection.getId(),collection.getName(),collection.getDescription(),image);
 	}
 }
