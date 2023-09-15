@@ -33,7 +33,7 @@ public class IgdbService {
 
 	public String searchGame(String game) {
 		APICalypse apiCalypse = new APICalypse()
-				.fields("summary,name,aggregated_rating,category, cover.image_id,collection").search(game).limit(1)
+				.fields("summary,name,aggregated_rating,category, cover.image_id,collection").search(game)
 				.where("category=0");
 		String requestBody = apiCalypse.buildQuery();
 		ResponseEntity<String> response = callEndpointGames(requestBody);

@@ -9,6 +9,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -33,9 +36,9 @@ import com.lauchilus.DTO.AddPlayingDto;
 import com.lauchilus.DTO.CollectionDataResponse;
 import com.lauchilus.DTO.CoverGame;
 import com.lauchilus.DTO.CreateCollectionDTO;
-import com.lauchilus.DTO.GameDTO;
 import com.lauchilus.DTO.GameListData;
 import com.lauchilus.DTO.GameMapper;
+import com.lauchilus.DTO.GameResponseDTO;
 import com.lauchilus.DTO.ListResponseDto;
 import com.lauchilus.DTO.PlayedResponseDto;
 import com.lauchilus.DTO.PlayingResponseDto;
@@ -57,7 +60,7 @@ import com.lauchilus.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
-@CrossOrigin("http://localhost:4200/")
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/gamelist")
 public class GameListController {
@@ -100,7 +103,17 @@ public class GameListController {
 		URI url = uriComponentsBuilder.path("/${id}").buildAndExpand(collection.getId()).toUri();
 		return ResponseEntity.created(url).body(response);
 	}
-
+	
+	
+	
+	@RequestMapping(value="/*", method = RequestMethod.OPTIONS)
+	   ResponseEntity<?> collectionOptions() 
+	   {
+	      return ResponseEntity
+	          .ok()
+	          .allow(HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS,HttpMethod.DELETE)
+	              .build();
+	   }
 	// This endpoint adds a game to a collection. It receives a collection ID as a
 	// @PathVariable in the URL and the following data in the request body: an
 	// integer game_id. The purpose is to search for a game and then add it to a
@@ -176,7 +189,7 @@ public class GameListController {
 			String game = service.searchGameById(data.getGame_id()).toString();
 			GameMapper[] dataCover = objectMapper.readValue(game, GameMapper[].class);
 			String base64Image = getImageResponse(dataCover[0].getCover());
-			PlayingResponseDto response = new PlayingResponseDto(data, base64Image);
+			PlayingResponseDto response = new PlayingResponseDto(data,base64Image,dataCover[0].getName());
 			responseList.add(response);
 		}
 		return ResponseEntity.ok(responseList);
@@ -215,17 +228,17 @@ public class GameListController {
 	// This endpoint retrieves a list of all the games in a collection specified as
 	// a @PathVariable in the URL.
 	@GetMapping("/{collection}/games")
-	public ResponseEntity<List<ListResponseDto>> getGamesCollection(@PageableDefault(size = 10) Pageable paginacion,
+	public ResponseEntity<List<GameResponseDTO>> getGamesCollection(@PageableDefault(size = 10) Pageable paginacion,
 			@PathVariable Integer collection) throws IOException {
 		List<Game> response = gameRepository.findByCollection_id(collection);
 		ObjectMapper objectMapper = new ObjectMapper();
-		List<ListResponseDto> responseList = new ArrayList<>();
+		List<GameResponseDTO> responseList = new ArrayList<>();
 		for(Game game: response) {
 			String res = service.searchGameById2(game.getGame_Id());
 			GameListData[] data = objectMapper.readValue(res, GameListData[].class);
 			GameListData dat = data[0];
 			String image = getImageResponse(dat.getCover());
-			ListResponseDto resp = new ListResponseDto(dat, image);
+			GameResponseDTO resp = new GameResponseDTO(dat, image,game.getId());
 			responseList.add(resp);
 		}
 		return ResponseEntity.ok(responseList);
@@ -234,17 +247,34 @@ public class GameListController {
 	// This endpoint searches for a game in the IGDB API based on a name provided as
 	// a @PathVariable in the URL. It retrieves all the available data for the
 	// matching game.
-	@GetMapping("/{name}")
-	public ResponseEntity<SearchResponseDto> searchGameByName(@PathVariable String name) throws IOException {
+//	@GetMapping("/{name}")
+//	public ResponseEntity<SearchResponseDto> searchGameByName(@PathVariable String name) throws IOException {
+//		String response = service.searchGame(name);
+//		ObjectMapper objectMapper = new ObjectMapper();
+//		GameData[] dataArray = objectMapper.readValue(response, GameData[].class);
+//		GameData data = dataArray[0];
+//		String image = getImageResponse(data.getCover());
+//		SearchResponseDto resp = new SearchResponseDto(data, image, data.getCollection());
+//		return ResponseEntity.ok(resp);
+//	}
+
+	@GetMapping("/searchByName/{name}")
+	public ResponseEntity<List<SearchResponseDto>> searchGamesByName(@PathVariable String name) throws IOException {
+		List<SearchResponseDto> results = new ArrayList<>();
 		String response = service.searchGame(name);
 		ObjectMapper objectMapper = new ObjectMapper();
 		GameData[] dataArray = objectMapper.readValue(response, GameData[].class);
-		GameData data = dataArray[0];
-		String image = getImageResponse(data.getCover());
-		SearchResponseDto resp = new SearchResponseDto(data, image, data.getCollection());
-		return ResponseEntity.ok(resp);
+		for(GameData data: dataArray) {
+			String image = getImageResponse(data.getCover());
+			SearchResponseDto resp = new SearchResponseDto(data, image, data.getCollection());
+			results.add(resp);
+		}
+//		GameData data = dataArray[0];
+//		String image = getImageResponse(data.getCover());
+//		SearchResponseDto resp = new SearchResponseDto(data, image, data.getCollection());
+		return ResponseEntity.ok(results);
 	}
-
+	
 	@GetMapping("/listGames")
 	public ResponseEntity<List<ListResponseDto>> listOfGames() throws IOException {
 		String response = service.listGames();
@@ -336,6 +366,13 @@ public class GameListController {
 		gameRepository.deleteAll(games);
 		collectionRepository.delete(collection);
 		return ResponseEntity.ok("Collection deleted");
+	}
+	
+	@DeleteMapping("/{username}/collection/{gameId}")
+	public ResponseEntity deleteGameFromCollection(@PathVariable String username, @PathVariable Integer gameId) {
+		Game game = gameRepository.getReferenceById(gameId);
+		gameRepository.delete(game);
+		return ResponseEntity.ok("game from collection deleted");
 	}
 
 	// helpers

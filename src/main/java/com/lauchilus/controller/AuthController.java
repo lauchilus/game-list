@@ -8,9 +8,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.lauchilus.DTO.RegisterDto;
 import com.lauchilus.DTO.UserRegisterDTO;
@@ -21,7 +23,7 @@ import com.lauchilus.security.TokenService;
 
 import jakarta.validation.Valid;
 
-
+@CrossOrigin(origins = "http://localhost:4200")
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
@@ -39,31 +41,27 @@ public class AuthController {
 	private PasswordEncoder passwordEncoder;
 
 
-//	@GetMapping("/login")
-//    public String showLoginPage() {
-//        return "login"; // Nombre de la plantilla de login
-//    }
-//
-//    @GetMapping("/register")
-//    public String showRegistrationPage() {
-//        return "register"; // Nombre de la plantilla de registro
-//    }
-
 	@PostMapping("/login")
 	public ResponseEntity autenticarUsuario(@RequestBody @Valid UserRegisterDTO user) {
+		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"+user.username()+"AA"+user.password());
 		Authentication authToken = new UsernamePasswordAuthenticationToken(user.username(), user.password());
 		var usuarioAutenticado = authenticationManager.authenticate(authToken );
 		var JWTtoken = tokenService.generateToken((User) usuarioAutenticado.getPrincipal());
 		return ResponseEntity.ok(new DatosJWTToken(JWTtoken));
 
 	}
+	
+	@RequestMapping(value = "/login", method = RequestMethod.OPTIONS)
+    public ResponseEntity handleOptionsRequest() {
+        return ResponseEntity.ok().build();
+    }
 
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
 		if(userRepository.existsByUsername(registerDto.username())) {
 			return new ResponseEntity<>("Username is taken! ", HttpStatus.BAD_REQUEST);
 		}
-
+		
 		User user = new User();
 		user.setUsername(registerDto.username());
 		user.setPassword(passwordEncoder.encode(registerDto.password()));

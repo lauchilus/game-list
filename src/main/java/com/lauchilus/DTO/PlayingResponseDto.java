@@ -13,8 +13,8 @@ public record PlayingResponseDto(
 		Integer game_id
 		) {
 
-	public PlayingResponseDto(Playing data,String image) {
-		this(data.getId(),data.getName(),image,data.getStartDate(),data.getFinishDate(),data.getGame_id());
+	public PlayingResponseDto(Playing data,String image, String name) {
+		this(data.getId(),name,image,data.getStartDate(),data.getFinishDate(),data.getGame_id());
 	}
 
 }

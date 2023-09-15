@@ -37,20 +37,14 @@ public class Playing {
 	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private User user;
-	private byte[] image;
-
-    private String name;
-    private String description;
 
     private LocalDateTime startDate = LocalDateTime.now();
     private LocalDateTime finishDate = null;
     private Integer game_id;
 
     public Playing(@Valid AddPlayingDto playingDto, User user) {
-		this.user = user;
-		this.name = playingDto.name();
-		this.description = playingDto.description();
-		this.game_id = playingDto.game_id();
+		this.user = user;		
+		this.game_id = playingDto.game_Id();
 	}
 
 	public void updateFinishDate() {

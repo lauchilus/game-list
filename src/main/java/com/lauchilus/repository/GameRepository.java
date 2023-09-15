@@ -15,4 +15,5 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
 	Page<Game> findByCollection_id(Integer collection, Pageable paginacion);
 
 	List<Game> findByCollection_id(Integer collectionId);
+
 }

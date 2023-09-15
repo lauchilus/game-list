@@ -1,6 +1,7 @@
 package com.lauchilus.entity;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import com.lauchilus.DTO.CreateCollectionDTO;
@@ -54,9 +55,14 @@ public class Collection {
 		this.name = createCollectionDTO.name();
 		this.description = createCollectionDTO.description();
 		if(!createCollectionDTO.image().equals(null)) {
-		this.image = createCollectionDTO.image();
+		this.image = imageToByte(createCollectionDTO.image());
 		}
 	}
+    
+    private byte[] imageToByte(String image) {
+    	String base64Data = image.replace("data:image/jpeg;base64,", "");
+    	return Base64.getDecoder().decode(base64Data);
+    }
 
     public void addGame(Game game) {
     	this.games.add(game);
