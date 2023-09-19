@@ -9,10 +9,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.api.igdb.utils.ImageBuilderKt;
@@ -60,8 +58,8 @@ import com.lauchilus.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
-@CrossOrigin("*")
-@RestController
+@CrossOrigin(origins="*")
+@Controller
 @RequestMapping("/gamelist")
 public class GameListController {
 
@@ -87,6 +85,11 @@ public class GameListController {
 	public String test() {
 		return "funciona";
 	}
+	
+//	@RequestMapping(value = "/*",method = RequestMethod.OPTIONS)
+//	public ResponseEntity handle() {
+//	    return new ResponseEntity(HttpStatus.OK);
+//	}
 
 	// post for each endpoint
 
@@ -106,14 +109,7 @@ public class GameListController {
 	
 	
 	
-	@RequestMapping(value="/*", method = RequestMethod.OPTIONS)
-	   ResponseEntity<?> collectionOptions() 
-	   {
-	      return ResponseEntity
-	          .ok()
-	          .allow(HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS,HttpMethod.DELETE)
-	              .build();
-	   }
+	
 	// This endpoint adds a game to a collection. It receives a collection ID as a
 	// @PathVariable in the URL and the following data in the request body: an
 	// integer game_id. The purpose is to search for a game and then add it to a

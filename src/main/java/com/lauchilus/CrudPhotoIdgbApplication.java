@@ -29,6 +29,8 @@ public class CrudPhotoIdgbApplication {
 	RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
+	
+	
 
 
 //	@Bean

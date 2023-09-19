@@ -51,10 +51,7 @@ public class AuthController {
 
 	}
 	
-	@RequestMapping(value = "/login", method = RequestMethod.OPTIONS)
-    public ResponseEntity handleOptionsRequest() {
-        return ResponseEntity.ok().build();
-    }
+	
 
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
