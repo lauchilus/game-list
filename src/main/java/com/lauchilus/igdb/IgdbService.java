@@ -100,7 +100,7 @@ public class IgdbService {
 	}
 
 	public String listGames() {
-		APICalypse apiCalypse = new APICalypse().fields("name,storyline,follows,cover.image_id").limit(10)
+		APICalypse apiCalypse = new APICalypse().fields("name,storyline,follows,cover.image_id").limit(12)
 				.sort("follows", Sort.DESCENDING).where("follows!=null");
 		String requestBody = apiCalypse.buildQuery();
 		ResponseEntity<String> response = callEndpointGames(requestBody);

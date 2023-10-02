@@ -37,10 +37,16 @@ public class Played {
 	@JoinColumn(name = "user_id")
 	private User user;
 	private Integer game_id;
-
+	
+	
+	private String review;
+	private Integer rating;
+	
 	public Played(User user, @Valid AddPlayedDto playedDto) {
 		this.user = user;
 		this.game_id = playedDto.game_Id();
+		this.review = playedDto.review();
+		this.rating = playedDto.rating();
 	}
 
 	public Played(User user, Integer game_id) {

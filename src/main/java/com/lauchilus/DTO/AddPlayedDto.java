@@ -4,7 +4,9 @@ import jakarta.validation.constraints.NotNull;
 
 public record AddPlayedDto(
 		@NotNull
-		Integer game_Id
+		Integer game_Id,
+		String review,
+		Integer rating
 		
 		) {
 

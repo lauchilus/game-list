@@ -1,0 +1,3 @@
+ALTER TABLE played
+ADD COLUMN review TEXT,
+ADD COLUMN rating INT;
